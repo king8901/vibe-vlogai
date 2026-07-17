@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VibeVlogAI — Your Friendly Script &amp; SEO Buddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="grain"></div>
+
+  <header class="hud">
+  <div class="hud__brand">
+    <span class="hud__slate">✨</span>
+    <div class="hud__title">
+      <h1>vibe<span class="accent-mixed">vlog</span>ai</h1>
+      <p>your script &amp; seo buddy</p>
+    </div>
+  </div>
+  <div class="hud__status" id="hudStatus">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Ready to help</span>
+  </div>
+</header>
+
+
+<main class="stage">
+
+  <section class="intake">
+    <label for="conceptInput" class="intake__label">
+      <span class="intake__eyebrow">✨ tell me your idea</span>
+      Hey, what's your vlog about? Describe the vibe, the place, the story — like you're telling a friend over coffee.
+    </label>
+    <div class="intake__row">
+      <textarea
+        id="conceptInput"
+        placeholder="e.g. A rainy-day walk through my hometown — grabbing street food, chatting with shopkeepers, and capturing those cozy, cinematic moments"
+        rows="3"
+      ></textarea>
+      <button id="generateBtn" class="rec-btn" type="button">
+        <span class="rec-btn__dot"></span>
+        <span class="rec-btn__label">Let's go</span>
+      </button>
+    </div>
+    <p class="intake__error" id="errorMsg" hidden></p>
+  </section>
+
+  <section class="columns">
+
+    <article class="panel panel--creative" id="creativePanel">
+      <div class="panel__bracket panel__bracket--tl"></div>
+      <div class="panel__bracket panel__bracket--tr"></div>
+      <div class="panel__bracket panel__bracket--bl"></div>
+      <div class="panel__bracket panel__bracket--br"></div>
+
+      <header class="panel__header">
+        <span class="panel__eyebrow">🎬 your script</span>
+        <h2>Production Script</h2>
+        <div class="panel__meta">
+          <span class="rec-indicator" id="creativeRec"><span class="rec-indicator__dot"></span>writing</span>
+          <button class="copy-btn" data-target="creativeOutput" title="Copy script">📋 copy</button>
+        </div>
+      </header>
+      <div class="panel__body" id="creativeOutput">
+        <p class="placeholder">Your shot-by-shot script will appear here — hooks, camera moves, pacing, and a smooth ending to wrap it all up.</p>
+      </div>
+    </article>
+
+    <article class="panel panel--seo" id="seoPanel">
+      <div class="panel__bracket panel__bracket--tl"></div>
+      <div class="panel__bracket panel__bracket--tr"></div>
+      <div class="panel__bracket panel__bracket--bl"></div>
+      <div class="panel__bracket panel__bracket--br"></div>
+
+      <header class="panel__header">
+        <span class="panel__eyebrow">📈 seo & metadata</span>
+        <h2>Publish Metadata</h2>
+        <div class="panel__meta">
+          <span class="rec-indicator" id="seoRec"><span class="rec-indicator__dot"></span>writing</span>
+          <button class="copy-btn" data-target="seoOutput" title="Copy metadata">📋 copy</button>
+        </div>
+      </header>
+      <div class="panel__body" id="seoOutput">
+        <p class="placeholder">Publish-ready titles, description, tags, and a pinned comment — all set to paste when you go live.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="columns columns--bottom">
+    <article class="panel panel--thumbnail" id="thumbnailPanel">
+      <div class="panel__bracket panel__bracket--tl"></div>
+      <div class="panel__bracket panel__bracket--tr"></div>
+      <div class="panel__bracket panel__bracket--bl"></div>
+      <div class="panel__bracket panel__bracket--br"></div>
+
+      <header class="panel__header">
+        <span class="panel__eyebrow">🖼️ thumbnail</span>
+        <h2>Thumbnail Concept</h2>
+        <div class="panel__meta">
+          <span class="rec-indicator" id="thumbnailRec"><span class="rec-indicator__dot"></span>writing</span>
+          <button class="copy-btn" data-target="thumbnailOutput" title="Copy thumbnail concept">📋 copy</button>
+        </div>
+      </header>
+      <div class="panel__body" id="thumbnailOutput">
+        <p class="placeholder">5 thumbnail ideas with title, image references, and AI prompt will appear here.</p>
+      </div>
+    </article>
+
+
+
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>Made with <span class="foot__heart">♥</span> by AI SQUAD · your story, our words</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
+
+

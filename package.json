@@ -1,0 +1,11 @@
+{
+  "name": "vibe-vlogai",
+  "private": true,
+  "version": "1.0.0",
+  "description": "VibeVlogAI - deployable Node backend serving the frontend",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  }
+}
+
