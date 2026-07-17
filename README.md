@@ -176,44 +176,34 @@ Generated as clean Markdown with this structure:
 
 ---
 
-## Deployment (AWS Free Tier friendly)
+## Deployment (Render - Docker)
 
-This project is set up for a **single Node service** that serves the frontend and exposes the API.
+This project is a **single Node service** that serves the frontend and exposes the API.
 
-### Option A (recommended): Elastic Beanstalk (Docker / free tier eligible)
+### 1) Add environment variables in Render
 
-1. Create an Elastic Beanstalk application (platform: **Docker** / **Node.js**).
-2. Set environment variables in the EB console:
-   - `GEMINI_API_KEY` = your Gemini key
-   - `PORT` = `5050` (default)
-   - `HOST` = `0.0.0.0`
-   - (optional) `GEMINI_MODEL` = `gemini-3.1-flash-lite`
-3. Deploy using the repo root. The `Dockerfile` builds a container that runs `backend/server.js`.
+Set:
+- `GEMINI_API_KEY` = your Gemini key (**required**)
+- (optional) `GEMINI_MODEL` = `gemini-3.1-flash-lite`
+- (optional) `PORT` = `5050`
+- (optional) `HOST` = `0.0.0.0`
 
-After deployment, open the EB URL. The UI will call `POST /api/generate` on the **same origin**.
+### 2) Use Dockerfile
 
-### Option B: EC2 (simplest for free tier)
+Render should build from the repo root using the provided `Dockerfile`, which starts:
+- `node backend/server.js`
 
-1. Launch an EC2 instance (Ubuntu is typical).
-2. Install Docker.
-3. Build & run:
+### 3) Port
 
-```bash
-docker build -t vibe-vlogai .
+Ensure the Render service listens on port **5050** (the backend exposes `5050` in the container).
 
-docker run -p 5050:5050 \
-  -e GEMINI_API_KEY="YOUR_KEY" \
-  -e PORT=5050 \
-  -e HOST=0.0.0.0 \
-  vibe-vlogai
-```
-
-4. Open port 5050 in the EC2 security group.
+After deployment, open the Render URL. The UI calls `POST /api/generate` and streams results via **SSE** on the same origin.
 
 ---
 
 
 ## Notes
+
 
 - The Gemini API key is server-side only; it is **never exposed** to the browser.
 - CORS is currently open in `backend/server.js` for local development. For production, restrict it to your frontend origin.

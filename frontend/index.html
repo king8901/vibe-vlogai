@@ -23,6 +23,9 @@
     </div>
   </div>
   <div class="hud__status" id="hudStatus">
+    <button id="themeToggle" class="theme-toggle" type="button" title="Toggle light/dark">Theme</button>
+
+
     <span class="dot" id="statusDot"></span>
     <span id="statusText">Ready to help</span>
   </div>
@@ -47,10 +50,21 @@
         <span class="rec-btn__label">Let's go</span>
       </button>
     </div>
+
+    <div class="intake__row" style="margin-top: 12px; align-items:center;">
+      <label style="display:flex; align-items:center; gap:10px; color: var(--text-muted); font-family: var(--font-mono); font-size: 12px;">
+        <span>Length</span>
+        <select id="lengthSelect" style="background: var(--bg-raised); border:1px solid var(--line); border-radius: var(--radius); color: var(--text); padding: 8px 10px; font-family: var(--font-mono);">
+          <option value="short">Shorts (up to ~60s)</option>
+          <option value="long" selected>Long (2–5 min)</option>
+        </select>
+      </label>
+    </div>
+
     <p class="intake__error" id="errorMsg" hidden></p>
   </section>
 
-  <section class="columns">
+
 
     <article class="panel panel--creative" id="creativePanel">
       <div class="panel__bracket panel__bracket--tl"></div>
@@ -63,7 +77,10 @@
         <h2>Production Script</h2>
         <div class="panel__meta">
           <span class="rec-indicator" id="creativeRec"><span class="rec-indicator__dot"></span>writing</span>
-          <button class="copy-btn" data-target="creativeOutput" title="Copy script">📋 copy</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="regen-btn" data-section="creative" type="button" title="Regenerate creative">↻ regenerate</button>
+            <button class="copy-btn" data-target="creativeOutput" title="Copy script">📋 copy</button>
+          </div>
         </div>
       </header>
       <div class="panel__body" id="creativeOutput">
@@ -82,7 +99,10 @@
         <h2>Publish Metadata</h2>
         <div class="panel__meta">
           <span class="rec-indicator" id="seoRec"><span class="rec-indicator__dot"></span>writing</span>
-          <button class="copy-btn" data-target="seoOutput" title="Copy metadata">📋 copy</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="regen-btn" data-section="seo" type="button" title="Regenerate seo">↻ regenerate</button>
+            <button class="copy-btn" data-target="seoOutput" title="Copy metadata">📋 copy</button>
+          </div>
         </div>
       </header>
       <div class="panel__body" id="seoOutput">
@@ -104,7 +124,10 @@
         <h2>Thumbnail Concept</h2>
         <div class="panel__meta">
           <span class="rec-indicator" id="thumbnailRec"><span class="rec-indicator__dot"></span>writing</span>
-          <button class="copy-btn" data-target="thumbnailOutput" title="Copy thumbnail concept">📋 copy</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="regen-btn" data-section="thumbnail" type="button" title="Regenerate thumbnail">↻ regenerate</button>
+            <button class="copy-btn" data-target="thumbnailOutput" title="Copy thumbnail concept">📋 copy</button>
+          </div>
         </div>
       </header>
       <div class="panel__body" id="thumbnailOutput">
@@ -119,7 +142,7 @@
 </main>
 
 <footer class="foot">
-  <span>Made with <span class="foot__heart">♥</span> by AI SQUAD · your story, our words</span>
+  <span>Made with <span class="foot__heart">♥</span> by AI SQUAD · Your Story, Our Words</span>
 </footer>
 
 <script src="app.js"></script>

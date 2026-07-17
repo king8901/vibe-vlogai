@@ -33,6 +33,41 @@ html, body {
   min-height: 100vh;
 }
 
+/* ---------- Theme toggling (dark/light) ---------- */
+
+body[data-theme="light"] {
+  --bg: #f7f7fb;
+  --bg-raised: #ffffff;
+  --bg-panel: #ffffff;
+  --line: #e6e3ee;
+  --line-soft: #eeeaf5;
+  --text: #1a1523;
+  --text-muted: #5c5567;
+  --text-faint: #7a7387;
+
+  --shadow-soft: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.theme-toggle {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--text);
+
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-panel);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+
 body {
   position: relative;
   display: flex;
@@ -102,7 +137,7 @@ body {
 .hud__status {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -471,6 +506,32 @@ textarea#conceptInput::placeholder {
   border-color: var(--creative-dim);
   background: rgba(125,211,200,0.08);
 }
+
+.regen-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.regen-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+  background: var(--bg-raised);
+}
+
+.regen-btn:disabled {
+  color: var(--text-faint);
+  border-color: var(--line-soft);
+  cursor: not-allowed;
+}
+
 
 .panel__body {
   flex: 1;

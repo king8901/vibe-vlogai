@@ -1,7 +1,8 @@
 (() => {
-  // Default to same-origin so the deployed backend serves the frontend + API.
+  // Default to backend origin in dev (backend runs on :5050).
   // Optional override: window.__API_BASE__ (e.g., if you host API separately).
-  const API_BASE = (window.__API_BASE__ || window.location.origin);
+  const API_BASE = (window.__API_BASE__ || "http://localhost:5050");
+
 
 
   const el = {
@@ -17,7 +18,13 @@
     thumbnailRec: document.getElementById("thumbnailRec"),
     seoRec: document.getElementById("seoRec"),
   };
-  const state = { creative: "", thumbnail: "", seo: "", generating: false };
+  const state = {
+    creative: "",
+    thumbnail: "",
+    seo: "",
+    generating: false,
+    activeSectionFilter: null,
+  };
 
   const PLACEHOLDERS = {
     creative: el.creativeOutput.innerHTML,
@@ -308,7 +315,6 @@
 
 
   function resetPanels() {
-
     state.creative = "";
     state.thumbnail = "";
     state.seo = "";
@@ -320,9 +326,49 @@
     el.seoRec.classList.remove("active");
   }
 
+  function resetSection(section) {
+    if (section === "creative") {
+      state.creative = "";
+      el.creativeOutput.innerHTML = PLACEHOLDERS.creative;
+      el.creativeRec.classList.remove("active");
+    } else if (section === "thumbnail") {
+      state.thumbnail = "";
+      el.thumbnailOutput.innerHTML = PLACEHOLDERS.thumbnail;
+      el.thumbnailRec.classList.remove("active");
+    } else if (section === "seo") {
+      state.seo = "";
+      el.seoOutput.innerHTML = PLACEHOLDERS.seo;
+      el.seoRec.classList.remove("active");
+    }
+  }
+
   function setBusy(isBusy) {
     state.generating = isBusy;
     el.btn.disabled = isBusy;
+
+    // Disable regenerate buttons while generating
+    document.querySelectorAll(".regen-btn").forEach((b) => {
+      b.disabled = isBusy;
+    });
+  }
+
+  function setSectionActive(section, detectedLang) {
+    if (section === "creative") {
+      el.creativeRec.classList.add("active");
+      el.creativeOutput.innerHTML = `<p class="placeholder thinking">${getLocalizedString("thinking", detectedLang)}<span class="think-dots"></span></p>`;
+    } else if (section === "thumbnail") {
+      el.thumbnailRec.classList.add("active");
+      el.thumbnailOutput.innerHTML = `<p class="placeholder thinking">${getLocalizedString("thinking", detectedLang)}<span class="think-dots"></span></p>`;
+    } else if (section === "seo") {
+      el.seoRec.classList.add("active");
+      el.seoOutput.innerHTML = `<p class="placeholder thinking">${getLocalizedString("thinking", detectedLang)}<span class="think-dots"></span></p>`;
+    }
+  }
+
+  function clearSectionActive(section) {
+    if (section === "creative") el.creativeRec.classList.remove("active");
+    else if (section === "thumbnail") el.thumbnailRec.classList.remove("active");
+    else if (section === "seo") el.seoRec.classList.remove("active");
   }
 
   async function generate() {
@@ -330,6 +376,7 @@
     const detectedLang = detectLanguage(concept);
     el.error.hidden = true;
 
+    state.activeSectionFilter = null;
 
     if (!concept) {
       el.error.textContent = getLocalizedString("errorEmptyConcept", detectedLang);
@@ -338,6 +385,8 @@
     }
 
     if (state.generating) return;
+
+    const length = document.getElementById("lengthSelect")?.value === "long" ? "long" : "short";
 
     resetPanels();
     setBusy(true);
@@ -353,7 +402,7 @@
       const res = await fetch(`${API_BASE}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concept, lang: detectedLang }),
+        body: JSON.stringify({ concept, lang: detectedLang, length }),
       });
 
       if (!res.ok) {
@@ -401,26 +450,46 @@
   }
 
   function handleEvent(payload) {
+    const filter = state.activeSectionFilter; // null => all sections
+
     if (payload.type === "chunk" && payload.section === "creative") {
+      if (filter && filter !== "creative") return;
       state.creative += payload.text;
       renderMarkdown(el.creativeOutput, state.creative, true);
     } else if (payload.type === "chunk" && payload.section === "thumbnail") {
+      if (filter && filter !== "thumbnail") return;
       state.thumbnail += payload.text;
       renderMarkdown(el.thumbnailOutput, state.thumbnail, true);
     } else if (payload.type === "chunk" && payload.section === "seo") {
+      if (filter && filter !== "seo") return;
       state.seo += payload.text;
       renderMarkdown(el.seoOutput, state.seo, true);
-    } else if (payload.type === "section-end" && payload.section === "creative") {
-      renderMarkdown(el.creativeOutput, state.creative, false);
-      el.creativeRec.classList.remove("active");
-      el.thumbnailRec.classList.add("active");
-    } else if (payload.type === "section-end" && payload.section === "thumbnail") {
-      renderMarkdown(el.thumbnailOutput, state.thumbnail, false);
-      el.thumbnailRec.classList.remove("active");
-      el.seoRec.classList.add("active");
-    } else if (payload.type === "section-end" && payload.section === "seo") {
-      renderMarkdown(el.seoOutput, state.seo, false);
-      el.seoRec.classList.remove("active");
+    } else if (payload.type === "section-end") {
+      // End logic differs for full generation vs section-only regeneration
+      if (payload.section === "creative") {
+        if (!filter || filter === "creative") renderMarkdown(el.creativeOutput, state.creative, false);
+        if (!filter) {
+          el.creativeRec.classList.remove("active");
+          el.thumbnailRec.classList.add("active");
+        } else {
+          clearSectionActive("creative");
+        }
+      } else if (payload.section === "thumbnail") {
+        if (!filter || filter === "thumbnail") renderMarkdown(el.thumbnailOutput, state.thumbnail, false);
+        if (!filter) {
+          el.thumbnailRec.classList.remove("active");
+          el.seoRec.classList.add("active");
+        } else {
+          clearSectionActive("thumbnail");
+        }
+      } else if (payload.section === "seo") {
+        if (!filter || filter === "seo") renderMarkdown(el.seoOutput, state.seo, false);
+        if (!filter) {
+          el.seoRec.classList.remove("active");
+        } else {
+          clearSectionActive("seo");
+        }
+      }
     } else if (payload.type === "error") {
       const detectedLang = detectLanguage(el.input.value.trim());
       el.error.textContent = payload.message || getLocalizedString("errorFallback", detectedLang);
@@ -428,7 +497,91 @@
     }
   }
 
+  async function regenerateSection(section) {
+    const concept = el.input.value.trim();
+    const detectedLang = detectLanguage(concept);
+    el.error.hidden = true;
+
+    if (!concept) {
+      el.error.textContent = getLocalizedString("errorEmptyConcept", detectedLang);
+      el.error.hidden = false;
+      return;
+    }
+
+    if (state.generating) return;
+
+    state.activeSectionFilter = section;
+
+    // Reset + show placeholder only for that section
+    resetSection(section);
+    setBusy(true);
+    setStatus("live", getLocalizedString("thinking", detectedLang));
+
+    // Activate only the requested indicator + placeholder
+    setSectionActive(section, detectedLang);
+
+    try {
+      const length = document.getElementById("lengthSelect")?.value === "long" ? "long" : "short";
+
+      const res = await fetch(`${API_BASE}/api/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concept, lang: detectedLang, length }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Server responded with ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split("\n\n");
+        buffer = events.pop();
+
+        for (const evt of events) {
+          const line = evt.trim();
+          if (!line.startsWith("data:")) continue;
+          const jsonStr = line.slice(5).trim();
+          if (!jsonStr) continue;
+
+          let payload;
+          try { payload = JSON.parse(jsonStr); } catch (e) { continue; }
+          handleEvent(payload);
+        }
+      }
+
+      setStatus("done", getLocalizedString("done", detectedLang));
+    } catch (err) {
+      console.error(err);
+      el.error.textContent = err.message || getLocalizedString("errorBackendPort", detectedLang);
+      el.error.hidden = false;
+      setStatus(null, "ERROR");
+    } finally {
+      setBusy(false);
+      state.activeSectionFilter = null;
+      // Ensure indicators are cleaned
+      clearSectionActive("creative");
+      clearSectionActive("thumbnail");
+      clearSectionActive("seo");
+    }
+  }
+
   el.btn.addEventListener("click", generate);
+
+  document.querySelectorAll(".regen-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const section = btn.dataset.section;
+      if (section) regenerateSection(section);
+    });
+  });
   el.input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate();
   });
@@ -451,6 +604,26 @@
         }, 100);
       } catch (err) { /* clipboard unavailable */ }
     });
+  });
+
+  const themeToggle = document.getElementById("themeToggle");
+
+  function applyTheme(theme) {
+    const t = (theme === "light" || theme === "dark") ? theme : "light";
+    document.body.setAttribute("data-theme", t);
+    // Button label shows the NEXT action
+    // dark -> Dark Theme, light -> Light Theme
+    if (themeToggle) themeToggle.textContent = t === "light" ? "Dark Theme" : "Light Theme";
+  }
+
+  const savedTheme = window.localStorage ? window.localStorage.getItem("theme") : null;
+  applyTheme(savedTheme || "dark");
+
+  themeToggle?.addEventListener("click", () => {
+    const current = document.body.getAttribute("data-theme") || "dark";
+    const next = current === "light" ? "dark" : "light";
+    applyTheme(next);
+    window.localStorage?.setItem("theme", next);
   });
 
   const initialConcept = el.input ? el.input.value.trim() : "";

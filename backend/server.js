@@ -54,7 +54,8 @@ async function streamSection(res, model, prompt, section) {
 }
 
 app.post("/api/generate", async (req, res) => {
-  const { concept, lang } = req.body || {};
+  const { concept, lang, length } = req.body || {};
+
   const safeLang = typeof lang === "string" && lang.trim() ? lang.trim() : "en";
 
   if (!concept || typeof concept !== "string" || !concept.trim()) {
@@ -176,8 +177,10 @@ app.post("/api/generate", async (req, res) => {
 
   try {
     sseWrite(res, { type: "start" });
+    const safeLength = length === "long" ? "long" : "short";
+
     await generateSection(
-      buildCreativePrompt(trimmedConcept, safeLang),
+      buildCreativePrompt(trimmedConcept, safeLang, safeLength),
       "creative"
     );
     await generateSection(

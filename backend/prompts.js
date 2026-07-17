@@ -5,8 +5,10 @@
  * - buildThumbnailPrompt
  */
 
-function buildCreativePrompt(concept, lang = "en") {
+function buildCreativePrompt(concept, lang = "en", length = "short") {
+  const safeLength = length === "long" ? "long" : "short";
   return `You are a veteran cinematic Creative Director for short-form and long-form video creators.
+
 
 Language requirement:
 - Respond in EXACTLY the same language as the input concept.
@@ -26,7 +28,7 @@ ${concept}
 
 Turn it into a granular, shootable production script. Respond in clean Markdown using EXACTLY this structure and nothing else.
 
-## Hook (0-3s)
+${safeLength === "long" ? "## Hook (0-8s)\n" : "## Hook (0-3s)\n"}
 - Visual: <what's on screen>
 - Audio/VO: <line of narration or ambient sound>
 - Camera: <specific camera direction - angle, movement, lens feel>
@@ -40,7 +42,11 @@ For each beat of the video, add a numbered scene like this:
 - Audio/VO: <narration, sound design, or music cue>
 - Pacing: <cut speed / mood note>
 
-Include 4 to 7 scenes that logically develop the concept from hook to payoff.
+${safeLength === "long" ? "Include 10 to 14 scenes" : "Include 4 to 7 scenes"} that logically develop the concept from hook to payoff.
+
+If length is long, spread scenes across the full story with clear transitions and distinct visual beats (setup → complication → escalation → payoff).
+
+
 
 ## Loop Ending
 - Visual: <final frame that mirrors or sets up the opening for a seamless replay/loop>
@@ -49,7 +55,11 @@ Include 4 to 7 scenes that logically develop the concept from hook to payoff.
 ## Director's Notes
 - 2-3 bullet points with practical production tips specific to this concept.
 
-Keep every line concrete and specific to the concept above.`;
+Keep every line concrete and specific to the concept above.
+
+${safeLength === "long" ? "Long-form pacing rules:\n- Spread scenes so the story fully develops (not just quick beats).\n- Each scene should advance a distinct plot/visual change.\n- Use 2-3 beats for emotional escalation and 1-2 beats for resolution." : "Short-form pacing rules:\n- Scenes should be punchy and rapidly progressive."}
+`;
+
 }
 
 function buildSeoPrompt(concept, lang = "en") {
