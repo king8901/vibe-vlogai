@@ -1,7 +1,7 @@
 (() => {
   // Default to backend origin in dev (backend runs on :5050).
   // Optional override: window.__API_BASE__ (e.g., if you host API separately).
-  const API_BASE = (window.__API_BASE__ || "http://localhost:5050");
+  const API_BASE = (window.__API_BASE__ || "https://vibe-vlogai-nw7q.vercel.app/");
 
 
 
